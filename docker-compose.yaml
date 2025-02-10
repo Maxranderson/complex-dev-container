@@ -1,0 +1,64 @@
+version: '3.8'
+services:
+  api:
+    environment:
+      - TOPIC=${PES_TOPIC:-simple-event-in}
+      - TOPIC_SUB=${PES_TOPIC_SUB:-simple-event-ingestion}
+      - PUBSUB_PROJECT_ID=${GCP_PROJECT_ID:-local}
+      - PUBSUB_EMULATOR_HOST=pubsub:8085
+      - REDIS_URL=redis:6379
+    depends_on:
+      - pubsub-init
+      - redis
+    build: 
+      context: .
+      dockerfile: api.Dockerfile
+    ports:
+      - "3000:3000"
+  cache-ingest:
+    environment:
+      - TOPIC=${PES_TOPIC:-simple-event-in}
+      - TOPIC_SUB=${PES_TOPIC_SUB:-simple-event-ingestion}
+      - PUBSUB_PROJECT_ID=${GCP_PROJECT_ID:-local}
+      - PUBSUB_EMULATOR_HOST=pubsub:8085
+      - REDIS_URL=redis:6379
+    depends_on:
+      - pubsub-init
+      - redis
+    build: 
+      context: .
+      dockerfile: cache-ingest.Dockerfile
+  redis:
+    image: redis:7.4.0-alpine
+    mem_limit: 512m
+    mem_reservation: 512m
+    ports:
+      - 6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "-h", "localhost", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+  pubsub:
+    image: google/cloud-sdk:emulators
+    command: /bin/bash -c "gcloud beta emulators pubsub start --project=local --host-port='0.0.0.0:8085'"
+    ports:
+      - 8085    
+  pubsub-init:
+    image: curlimages/curl:latest
+    depends_on:
+      - pubsub
+    environment:
+      - PUBSUB_EMULATOR_HOST=pubsub:8085
+      - PUBSUB_PROJECT_ID=${GCP_PROJECT_ID:-local}
+      - TOPIC=${PES_TOPIC:-simple-event-in}
+      - TOPIC_SUB=${PES_TOPIC_SUB:-simple-event-ingestion}
+    command: >
+      sh -c "
+      sleep 10 &&
+      curl -X PUT http://$$PUBSUB_EMULATOR_HOST/v1/projects/$$PUBSUB_PROJECT_ID/topics/$$TOPIC &&
+      curl -X PUT http://$$PUBSUB_EMULATOR_HOST/v1/projects/$$PUBSUB_PROJECT_ID/subscriptions/$$TOPIC_SUB 
+      -H 'content-type: application/json' 
+      --data '{\"topic\":\"projects/'$$PUBSUB_PROJECT_ID'/topics/'$$TOPIC'\"}'
+      "

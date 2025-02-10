@@ -1,0 +1,14 @@
+version: '3.8'
+name: complex-dev-container
+services:
+  api:
+    build: 
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - .:/workspaces/complex-dev-container/:cached
+      - ssh-keys:/root/.ssh
+    command: tail -f /dev/null
+  cache-ingest: null
+volumes:
+  ssh-keys:
+    external: true

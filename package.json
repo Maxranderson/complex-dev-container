@@ -1,0 +1,27 @@
+{
+  "name": "complex-dev-container",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "api": "node src/api.js",
+    "ingest": "node src/cache-ingest.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Maxranderson/complex-dev-container.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Maxranderson/complex-dev-container/issues"
+  },
+  "homepage": "https://github.com/Maxranderson/complex-dev-container#readme",
+  "dependencies": {
+    "@google-cloud/pubsub": "^4.10.0",
+    "express": "^4.21.2",
+    "redis": "^4.7.0"
+  }
+}
