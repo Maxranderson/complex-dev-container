@@ -6,7 +6,7 @@ services:
       dockerfile: .devcontainer/Dockerfile
     volumes:
       - .:/workspaces/complex-dev-container/:cached
-      - ssh-keys:/root/.ssh
+      - ssh-keys:/home/node/.ssh
     command: tail -f /dev/null
   cache-ingest: null
 volumes:

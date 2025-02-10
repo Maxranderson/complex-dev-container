@@ -7,10 +7,8 @@
 	],
 	"service": "api",
 	"workspaceFolder": "/workspaces/complex-dev-container",
-	"mounts": [
-		"source=ssh-keys,target=/home/node/.ssh,type=volume"
-	],
 	"remoteUser": "node",
+	"containerUser": "node",
 	"containerEnv": {
 	},
 	"features": {
